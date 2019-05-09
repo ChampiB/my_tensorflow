@@ -1,0 +1,13 @@
+TODO: Small utility
+- Add regularization
+- Add softmax activation function
+- Improve precision of the metrics display during the training (Moving accuracy and SSE)
+- Add a Builder named trainingConfig which can be passed to the cnn.NeuralNetwork's fit method
+- Implement the HDense layer
+
+TODO: Medium utility
+- Allow to save and reload the network
+- Create a GPU implementation of the HCNN layer (hardware acceleration)
+
+TODO: Big utility
+- Test the project
