@@ -19,7 +19,7 @@ public class KWTA implements KWTAInterface {
      * @param x the input.
      * @return the output.
      */
-    public INDArray kwta(ConfConv2d conf, INDArray x) {
+    public INDArray activation(ConfConv2d conf, INDArray x) {
         // Launch one convolution task for each image.
         INDArray result = Nd4j.zeros(x.shape());
         List<Future<Boolean>> tasks = new LinkedList<>();

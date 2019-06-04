@@ -27,11 +27,7 @@ public class GPUTask {
         // Create the PTX file by calling the NVCC.
         String ptxFileName = preparePtxFile("./src/main/java/cnn/perf/gpu/kernel/" + kernelName);
         // Initialize the driver and create a context for the first device.
-        cuInit(0);
-        CUdevice device = new CUdevice();
-        cuDeviceGet(device, 0);
-        CUcontext context = new CUcontext();
-        cuCtxCreate(context, 0, device);
+        ContextHelper.initContext();
         // Load the ptx file.
         CUmodule module = new CUmodule();
         cuModuleLoad(module, ptxFileName);
@@ -47,19 +43,41 @@ public class GPUTask {
      * Execute the kernel function.
      * @param name the function's name.
      * @param parameters the parameters.
-     * @param numElements the number of elements to process.
+     * @param blockSize the number of threads.
+     * @param gridSize the number of blocks.
      */
-    protected void execute(String name, Pointer parameters, int numElements) {
-        // Call the kernel function.
-        int blockSize = 256;
-        int gridSize = (numElements + blockSize - 1) / blockSize;
-        cuLaunchKernel(functions.get(name),
+    protected void execute(String name, Pointer parameters, int gridSize, int blockSize) {
+        execute(name, parameters, gridSize, blockSize, 0);
+    }
+
+    /**
+     * Execute the kernel function.
+     * @param name the function's name.
+     * @param parameters the parameters.
+     * @param blockSize the number of threads.
+     * @param gridSize the number of blocks.
+     */
+    protected void execute(String name, Pointer parameters, int gridSize, int blockSize, int sharedMemorySize) {
+        cuLaunchKernel(
+                functions.get(name),
                 gridSize,  1, 1,
                 blockSize, 1, 1,
-                0, null,
+                sharedMemorySize, null,
                 parameters, null
         );
         cuCtxSynchronize();
+    }
+
+    /**
+     * Execute the kernel function.
+     * @param name the function's name.
+     * @param parameters the parameters.
+     * @param numElements the number of elements to process.
+     */
+    protected void execute(String name, Pointer parameters, int numElements) {
+        int blockSize = 256;
+        int gridSize = (numElements + blockSize - 1) / blockSize;
+        execute(name, parameters, blockSize, gridSize);
     }
 
     /**

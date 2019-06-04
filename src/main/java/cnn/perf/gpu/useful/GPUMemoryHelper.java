@@ -12,10 +12,23 @@ public class GPUMemoryHelper {
 
     /**
      * Allocate the device input data, and copy the host input data to the device.
+     * @param data the input array.
+     * @return the gpu pointer.
+     */
+    static public CUdeviceptr mallocIntInput(int[] data) {
+        CUdeviceptr input = new CUdeviceptr();
+        cuMemAlloc(input, data.length * Sizeof.INT);
+        cuMemcpyHtoD(input, Pointer.to(data), data.length * Sizeof.INT);
+        return input;
+    }
+
+
+    /**
+     * Allocate the device input data, and copy the host input data to the device.
      * @param x the input array.
      * @return the gpu pointer.
      */
-    static public CUdeviceptr mallocInput(INDArray x) {
+    static public CUdeviceptr mallocFloatInput(INDArray x) {
         float[] data = x.data().asFloat();
         CUdeviceptr input = new CUdeviceptr();
         cuMemAlloc(input, data.length * Sizeof.FLOAT);
@@ -28,7 +41,7 @@ public class GPUMemoryHelper {
      * @param size the number of elements in the output buffer.
      * @return the gpu pointer.
      */
-    static public CUdeviceptr mallocOutput(int size) {
+    static public CUdeviceptr mallocFloatOutput(int size) {
         CUdeviceptr output = new CUdeviceptr();
         cuMemAlloc(output, size * Sizeof.FLOAT);
         return output;
@@ -36,13 +49,12 @@ public class GPUMemoryHelper {
 
     /**
      * Transfer the data from the GPU to the CPU.
-     * @param ygpu the GPU pointer.
+     * @param a the GPU pointer.
      * @return the INDArray (CPU pointer).
      */
-    static public INDArray toCPU(CUdeviceptr ygpu) {
-        int size = ygpu.getByteBuffer().array().length;
+    static public INDArray toCPU(CUdeviceptr a, int size) {
         float[] buffer = new float[size];
-        cuMemcpyDtoH(Pointer.to(buffer), ygpu, size * Sizeof.FLOAT);
+        cuMemcpyDtoH(Pointer.to(buffer), a, size * Sizeof.FLOAT);
         return Nd4j.create(buffer);
     }
 }

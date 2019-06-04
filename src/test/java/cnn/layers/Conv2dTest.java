@@ -6,13 +6,16 @@ import org.junit.jupiter.api.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
+import javax.sound.midi.Soundbank;
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class Conv2dTest {
 
     @Test
     void activationWithBias() {
-        INDArray w = Nd4j.create(new float[][][]{{{1, 1}, {1, 1}}});
+        INDArray w = Nd4j.create(new float[][][][]{{{{1, 1}, {1, 1}}}});
         INDArray bw = Nd4j.create(new float[]{1});
         INDArray x = Nd4j.create(new float[][][][]{{{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}}});
 
@@ -33,7 +36,7 @@ class Conv2dTest {
 
     @Test
     void activation() {
-        INDArray w = Nd4j.create(new float[][][]{{{1, 1}, {1, 1}}});
+        INDArray w = Nd4j.create(new float[][][][]{{{{1, 1}, {1, 1}}}});
         INDArray bw = Nd4j.create(new float[]{0});
         INDArray x = Nd4j.create(new float[][][][]{{{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}}});
 
@@ -53,8 +56,33 @@ class Conv2dTest {
     }
 
     @Test
+    void activationManyFeatures() {
+        INDArray w = Nd4j.create(new float[][][][]{{{{1, 1}, {1, 1}}}, {{{2, 2}, {2, 2}}}});
+        INDArray bw = Nd4j.create(new float[]{0, 0});
+        INDArray x = Nd4j.create(new float[][][][]{{{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}}});
+
+        Conv2d layer = new Conv2d(
+                new ConfConv2d()
+                        .setFilters(new int[]{2, 2, 2})
+                        .setStrides(new int[]{1, 1})
+        );
+        layer.setBw(bw);
+        layer.setW(w);
+
+        INDArray y = layer.activation(x, false);
+        assertEquals(12, y.getDouble(0, 0, 0, 0));
+        assertEquals(16, y.getDouble(0, 0, 0, 1));
+        assertEquals(24, y.getDouble(0, 0, 1, 0));
+        assertEquals(28, y.getDouble(0, 0, 1, 1));
+        assertEquals(24, y.getDouble(0, 1, 0, 0));
+        assertEquals(32, y.getDouble(0, 1, 0, 1));
+        assertEquals(48, y.getDouble(0, 1, 1, 0));
+        assertEquals(56, y.getDouble(0, 1, 1, 1));
+    }
+
+    @Test
     void activationKWTA() {
-        INDArray w = Nd4j.create(new float[][][]{{{1, 1}, {1, 1}},{{2, 2}, {2, 2}}});
+        INDArray w = Nd4j.create(new float[][][][]{{{{1, 1}, {1, 1}}},{{{2, 2}, {2, 2}}}});
         INDArray bw = Nd4j.create(new float[]{0, 0});
         INDArray x = Nd4j.create(new float[][][][]{{{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}}});
 
@@ -80,7 +108,7 @@ class Conv2dTest {
 
     @Test
     void activationWithBiasAndKWTA() {
-        INDArray w = Nd4j.create(new float[][][]{{{1, 1}, {1, 1}},{{2, 2}, {2, 2}}});
+        INDArray w = Nd4j.create(new float[][][][]{{{{1, 1}, {1, 1}}},{{{2, 2}, {2, 2}}}});
         INDArray bw = Nd4j.create(new float[]{1, 1});
         INDArray x = Nd4j.create(new float[][][][]{{{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}}});
 
@@ -126,17 +154,69 @@ class Conv2dTest {
         return (NeuralNetwork.SSE(t, yp) - NeuralNetwork.SSE(t, ym)) / (2 * epsilon);
     }
 
+    double computeNumericalGradientInput(Conv2d layer, int[] wp, INDArray x, INDArray t) {
+        double epsilon = 0.01;
+        double xi = x.getDouble(wp);
+        x.putScalar(wp, xi - epsilon);
+        INDArray ym = layer.activation(x, false).dup();
+        x.putScalar(wp, xi + epsilon);
+        INDArray yp = layer.activation(x, false).dup();
+        x.putScalar(wp, xi);
+        return (NeuralNetwork.SSE(t, yp) - NeuralNetwork.SSE(t, ym)) / (2 * epsilon);
+    }
+
     @Test
-    void gradientRelu() {
-        INDArray w = Nd4j.create(new float[][][]{
-                {{1, 1}, {1, 1}},
-                {{2, 2}, {2, 2}}
+    void gradientReluInput() {
+        INDArray w = Nd4j.create(new float[][][][]{
+                {{{1, 1}, {1, 1}}},
+                {{{2, 2}, {2, 2}}}
         });
         INDArray bw = Nd4j.create(new float[]{1, 1});
-        INDArray x = Nd4j.create(new float[][][][]{{ // 1 1 3 3
+        INDArray x = Nd4j.create(new float[][][][]{{
                 {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
         }});
-        INDArray t = Nd4j.create(new float[][][][]{{ // 1 2 2 2
+        INDArray t = Nd4j.create(new float[][][][]{{
+                {{1, 1}, {1, 1}},
+                {{1, 1}, {1, 1}}
+        }});
+
+        Conv2d layer = new Conv2d(
+                new ConfConv2d()
+                        .setFilters(new int[]{2, 2, 2})
+                        .setStrides(new int[]{1, 1})
+        );
+        layer.setBw(bw);
+        layer.setW(w);
+
+        INDArray y = layer.activation(x, true);
+        INDArray gradient = layer.update(NeuralNetwork.SSEGradient(t, y), 1).dup();
+        layer.setBw(bw.dup());
+        layer.setW(w.dup());
+
+        for (int i = 0; i < x.shape()[1]; i++) {
+            for (int j = 0; j < x.shape()[2]; j++) {
+                for (int k = 0; k < x.shape()[3]; k++) {
+                    double grad = computeNumericalGradientInput(layer, new int[]{0, i, j, k}, x, t);
+                    assertTrue(
+                            Math.abs(grad - gradient.getDouble(0, i, j, k)) < 0.1,
+                            "Numerical gradient checking."
+                    );
+                }
+            }
+        }
+    }
+
+    @Test
+    void gradientRelu() {
+        INDArray w = Nd4j.create(new float[][][][]{
+                {{{1, 1}, {1, 1}}},
+                {{{2, 2}, {2, 2}}}
+        });
+        INDArray bw = Nd4j.create(new float[]{1, 1});
+        INDArray x = Nd4j.create(new float[][][][]{{
+                {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
+        }});
+        INDArray t = Nd4j.create(new float[][][][]{{
                 {{1, 1}, {1, 1}},
                 {{1, 1}, {1, 1}}
         }});
@@ -159,9 +239,9 @@ class Conv2dTest {
         for (int i = 0; i < w.shape()[0]; i++) {
             for (int j = 0; j < w.shape()[1]; j++) {
                 for (int k = 0; k < w.shape()[2]; k++) {
-                    double grad = computeNumericalGradient(layer, new int[]{i, j, k}, x, t);
+                    double grad = computeNumericalGradient(layer, new int[]{i, 0, j, k}, x, t);
                     assertTrue(
-                            Math.abs(grad - gradient.getDouble(i, j, k)) < 0.1,
+                            Math.abs(grad - gradient.getDouble(i, 0, j, k)) < 0.1,
                             "Numerical gradient checking."
                     );
                 }
@@ -176,9 +256,9 @@ class Conv2dTest {
 
     @Test
     void gradientReluAndKWTA() {
-        INDArray w = Nd4j.create(new float[][][]{
-                {{1, 1}, {1, 1}},
-                {{2, 2}, {2, 2}}
+        INDArray w = Nd4j.create(new float[][][][]{
+                {{{1, 1}, {1, 1}}},
+                {{{2, 2}, {2, 2}}}
         });
         INDArray bw = Nd4j.create(new float[]{1, 1});
         INDArray x = Nd4j.create(new float[][][][]{{
@@ -208,9 +288,9 @@ class Conv2dTest {
         for (int i = 0; i < w.shape()[0]; i++) {
             for (int j = 0; j < w.shape()[1]; j++) {
                 for (int k = 0; k < w.shape()[2]; k++) {
-                    double grad = computeNumericalGradient(layer, new int[]{i, j, k}, x, t);
+                    double grad = computeNumericalGradient(layer, new int[]{i, 0, j, k}, x, t);
                     assertTrue(
-                            Math.abs(grad - gradient.getDouble(i, j, k)) < 0.1,
+                            Math.abs(grad - gradient.getDouble(i, 0, j, k)) < 0.1,
                             "Numerical gradient checking."
                     );
                 }
