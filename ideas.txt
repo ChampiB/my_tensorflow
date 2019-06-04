@@ -1,3 +1,8 @@
+TODO: Project direction / readings
+- Adversarial image (section 7.13)
+- Dropout
+- Neuron mining
+
 TODO: Small utility
 - Add regularization
 - Add softmax activation function
@@ -7,7 +12,8 @@ TODO: Small utility
 
 TODO: Medium utility
 - Allow to save and reload the network
-- Create a GPU implementation of the HCNN layer (hardware acceleration)
+- Train a model on ImageNet
+- Implement more complex model, e.g. ResNet, AlexNet, ...
 
 TODO: Big utility
-- Test the project
+- Create a GPU implementation of the HCNN layer (hardware acceleration)

@@ -1,12 +1,9 @@
 package cnn.layers;
 
+import cnn.perf.MaxPooling2dInterface;
+import cnn.perf.TasksFactory;
+import org.apache.commons.lang3.tuple.Pair;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.impl.indexaccum.IAMax;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.INDArrayIndex;
-import org.nd4j.linalg.indexing.NDArrayIndex;
-
-import java.util.Arrays;
 
 /**
  * Max pooling layer.
@@ -15,12 +12,14 @@ public class MaxPooling2d extends Layer {
 
     private int[] kernel;
     private INDArray mask;
+    private MaxPooling2dInterface maxPooling;
 
     /**
      * Constructor.
      * @param kernel the kernel size (i.e. pooling size).
      */
     public MaxPooling2d(int[] kernel) {
+        this.maxPooling = TasksFactory.create("MaxPooling2d");
         this.kernel = kernel;
     }
 
@@ -39,35 +38,9 @@ public class MaxPooling2d extends Layer {
      */
     @Override
     public INDArray activation(INDArray x, boolean training) {
-        long[] shape = x.shape();
-        INDArray y = Nd4j.zeros(shape[0], shape[1], shape[2] / kernel[0], shape[3] / kernel[1]);
-        if (training)
-            mask = Nd4j.zeros(shape);
-        for (int ii = 0; ii < y.shape()[0]; ii++) {
-            for (int fi = 0; fi < y.shape()[1]; fi++) {
-                for (int vi = 0; vi < y.shape()[2]; vi++) {
-                    for (int hi = 0; hi < y.shape()[3]; hi++) {
-                        INDArray xKernel = x.get(
-                                NDArrayIndex.point(ii), NDArrayIndex.point(fi),
-                                NDArrayIndex.interval(vi * kernel[0], (vi + 1) * kernel[0]),
-                                NDArrayIndex.interval(hi * kernel[1], (hi + 1) * kernel[1])
-                        );
-                        double maxValue = xKernel.maxNumber().doubleValue();
-                        y.putScalar(ii, fi, vi, hi, maxValue);
-                        if (training) {
-                            int idx = Nd4j.getExecutioner().execAndReturn(new IAMax(xKernel)).getFinalResult().intValue();
-                            idx = (int) (ii * shape[1] * shape[2] * shape[3] +
-                                    fi * shape[2] * shape[3] +
-                                    (vi * kernel[0] + idx / kernel[1]) * shape[3] +
-                                    hi * kernel[1] +
-                                    idx % kernel[1]);
-                            mask.putScalar(idx, 1);
-                        }
-                    }
-                }
-            }
-        }
-        return y;
+        Pair<INDArray, INDArray> result = maxPooling.maxPooling2d(kernel, x, training);
+        mask = result.getValue();
+        return result.getKey();
     }
 
     /**
@@ -78,22 +51,7 @@ public class MaxPooling2d extends Layer {
      */
     @Override
     public INDArray update(INDArray gradient, double lr) {
-        for (int ii = 0; ii < gradient.shape()[0]; ii++) {
-            for (int fi = 0; fi < gradient.shape()[1]; fi++) {
-                for (int vi = 0; vi < gradient.shape()[2]; vi++) {
-                    for (int hi = 0; hi < gradient.shape()[3]; hi++) {
-                        INDArrayIndex[] indexes = new INDArrayIndex[]{
-                                NDArrayIndex.point(ii), NDArrayIndex.point(fi),
-                                NDArrayIndex.interval(vi * kernel[0], (vi + 1) * kernel[0]),
-                                NDArrayIndex.interval(hi * kernel[1], (hi + 1) * kernel[1])
-                        };
-                        INDArray xKernel = mask.get(indexes).mul(gradient.getNumber(ii, fi, vi, hi));
-                        mask.put(indexes, xKernel);
-                    }
-                }
-            }
-        }
-        return mask;
+        return maxPooling.inputsGradients(kernel, gradient, mask);
     }
 
     /**

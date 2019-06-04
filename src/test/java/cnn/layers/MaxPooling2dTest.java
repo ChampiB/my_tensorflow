@@ -30,7 +30,7 @@ class MaxPooling2dTest {
                 {14, 13, 15, 16}
         }}});
         MaxPooling2d layer = new MaxPooling2d(new int[]{2, 2});
-        INDArray y = layer.activation(x, true);
+        layer.activation(x, true);
         INDArray gradient = Nd4j.create(new float[][][][]{{{
                 {1, 2}, {3, 4}
         }}});

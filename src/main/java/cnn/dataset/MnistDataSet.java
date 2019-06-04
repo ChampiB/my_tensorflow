@@ -34,6 +34,16 @@ public class MnistDataSet {
     }
 
     /**
+     * Create the helper for the MNIST data set.
+     * @param batchSize is the number of examples per batch
+     * @param nRows is the number of rows per image
+     * @param nCols is the number of columns per image
+     */
+    public MnistDataSet(int batchSize, int nRows, int nCols) {
+        this(123, batchSize, nRows, nCols);
+    }
+
+    /**
      * Getter.
      * @return the training set iterator.
      */
