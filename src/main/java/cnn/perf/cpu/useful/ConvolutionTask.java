@@ -1,4 +1,4 @@
-package cnn.perf;
+package cnn.perf.cpu.useful;
 
 import cnn.layers.conf.ConfConv2d;
 import org.nd4j.linalg.api.ndarray.INDArray;

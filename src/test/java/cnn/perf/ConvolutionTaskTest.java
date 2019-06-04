@@ -1,6 +1,8 @@
 package cnn.perf;
 
 import cnn.layers.conf.ConfConv2d;
+import cnn.perf.cpu.useful.ConvolutionTask;
+import cnn.perf.cpu.useful.ThreadPool;
 import org.junit.jupiter.api.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
