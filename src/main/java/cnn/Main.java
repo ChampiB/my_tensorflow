@@ -6,8 +6,6 @@ import cnn.dataset.MnistDataSet;
 import cnn.layers.Flatten;
 import cnn.layers.MaxPooling2d;
 import cnn.layers.conf.ConfConv2d;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 public class Main {
 

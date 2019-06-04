@@ -1,4 +1,4 @@
-package cnn.perf;
+package cnn.perf.cpu.useful;
 
 import cnn.layers.conf.ConfConv2d;
 import cnn.perf.cpu.useful.ConvolutionTask;

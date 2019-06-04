@@ -17,7 +17,7 @@ public class MaxPooling2d extends GPUTask implements MaxPooling2dInterface {
      * Default constructor.
      */
     public MaxPooling2d() {
-        super("cpca.cu", new String[]{"max_pooling_2d", "inputs_gradients"});
+        super("max_pooling_2d.cu", new String[]{"training_max_pooling_2d", "max_pooling_2d", "inputs_gradients"});
     }
 
     /**
@@ -26,7 +26,7 @@ public class MaxPooling2d extends GPUTask implements MaxPooling2dInterface {
      * @param x the input.
      * @return the shape.
      */
-    public int[] computeOutputShape(int[] kernel, INDArray x) {
+    private int[] computeOutputShape(int[] kernel, INDArray x) {
         return new int[]{
                 (int) x.shape()[0],
                 (int) x.shape()[1],
@@ -41,9 +41,22 @@ public class MaxPooling2d extends GPUTask implements MaxPooling2dInterface {
      * @param x the input.
      * @return the size.
      */
-    public int computeOutputSize(int[] kernel, INDArray x) {
+    private int computeOutputSize(int[] kernel, INDArray x) {
         int[] shape = computeOutputShape(kernel, x);
         return shape[0] *  shape[1] *  shape[2] * shape[3];
+    }
+
+    /**
+     * Create the configuration.
+     * @param kernel the kernel size.
+     * @param shape the input shape.
+     * @param nbElements the number of elements in the output array.
+     * @return the configuration.
+     */
+    private int[] createConf(int[] kernel, long[] shape, int nbElements) {
+        return new int[]{
+                kernel[0], kernel[1], (int)shape[1], (int)shape[2], (int)shape[3], nbElements
+        };
     }
 
     /**
@@ -54,28 +67,30 @@ public class MaxPooling2d extends GPUTask implements MaxPooling2dInterface {
      * @return a pair containing the output and the mask if training is true.
      */
     public Pair<INDArray, INDArray> maxPooling2d(int[] kernel, INDArray x, boolean training) {
-        // Allocate the device input data, and copy the host input data to the device.
-        CUdeviceptr xgpu = GPUMemoryHelper.mallocInput(x);
         // Allocate device output memory.
         int rsize = computeOutputSize(kernel, x);
-        CUdeviceptr rgpu = GPUMemoryHelper.mallocOutput(rsize);
+        CUdeviceptr rgpu = GPUMemoryHelper.mallocFloatOutput(rsize);
         int msize = (int)x.length();
-        CUdeviceptr mgpu = GPUMemoryHelper.mallocOutput(msize);
+        CUdeviceptr mgpu = GPUMemoryHelper.mallocFloatOutput(msize);
+        // Allocate the device input data, and copy the host input data to the device.
+        CUdeviceptr xgpu = GPUMemoryHelper.mallocFloatInput(x);
+        CUdeviceptr cgpu = GPUMemoryHelper.mallocIntInput(createConf(kernel, x.shape(), rsize));
         // Create kernel parameters.
-        Pointer kernelParameters = Pointer.to(
-                Pointer.to(kernel),
-                Pointer.to(xgpu),
-                Pointer.to(rgpu),
-                Pointer.to(mgpu)
-        );
-        execute("max_pooling_2d", kernelParameters, msize);
+        if (training) {
+            Pointer parameters = Pointer.to(Pointer.to(cgpu), Pointer.to(xgpu), Pointer.to(rgpu), Pointer.to(mgpu));
+            execute("training_max_pooling_2d", parameters, rsize);
+        } else {
+            Pointer parameters = Pointer.to(Pointer.to(cgpu), Pointer.to(xgpu), Pointer.to(rgpu));
+            execute("max_pooling_2d", parameters, rsize);
+        }
         // Allocate host output memory and copy the device output to the host.
-        INDArray result = GPUMemoryHelper.toCPU(rgpu).reshape(computeOutputShape(kernel, x));
-        INDArray mask = GPUMemoryHelper.toCPU(mgpu).reshape(x.shape());
+        INDArray result = GPUMemoryHelper.toCPU(rgpu, rsize).reshape(computeOutputShape(kernel, x));
+        INDArray mask = GPUMemoryHelper.toCPU(mgpu, msize).reshape(x.shape());
         // Clean up.
         cuMemFree(xgpu);
         cuMemFree(rgpu);
         cuMemFree(mgpu);
+        cuMemFree(cgpu);
         return new ImmutablePair<>(result, mask);
     }
 
@@ -87,26 +102,25 @@ public class MaxPooling2d extends GPUTask implements MaxPooling2dInterface {
      * @return the gradients.
      */
     public INDArray inputsGradients(int[] kernel, INDArray g, INDArray m) {
-        // Allocate the device input data, and copy the host input data to the device.
-        CUdeviceptr ggpu = GPUMemoryHelper.mallocInput(g);
-        CUdeviceptr mgpu = GPUMemoryHelper.mallocInput(m);
-        // Allocate device output memory.
+        // Compute the output size.
         int size = (int)g.length();
-        CUdeviceptr rgpu = GPUMemoryHelper.mallocOutput(size);
+        // Allocate the device input data, and copy the host input data to the device.
+        CUdeviceptr ggpu = GPUMemoryHelper.mallocFloatInput(g);
+        CUdeviceptr mgpu = GPUMemoryHelper.mallocFloatInput(m);
+        CUdeviceptr cgpu = GPUMemoryHelper.mallocIntInput(createConf(kernel, m.shape(), size));
         // Create kernel parameters.
         Pointer kernelParameters = Pointer.to(
-                Pointer.to(kernel),
+                Pointer.to(cgpu),
                 Pointer.to(ggpu),
-                Pointer.to(mgpu),
-                Pointer.to(rgpu)
+                Pointer.to(mgpu)
         );
         execute("inputs_gradients", kernelParameters, size);
         // Allocate host output memory and copy the device output to the host.
-        INDArray result = GPUMemoryHelper.toCPU(rgpu).reshape(g.shape());
+        INDArray result = GPUMemoryHelper.toCPU(mgpu, (int)m.length()).reshape(m.shape());
         // Clean up.
         cuMemFree(ggpu);
+        cuMemFree(cgpu);
         cuMemFree(mgpu);
-        cuMemFree(rgpu);
         return result;
     }
 }

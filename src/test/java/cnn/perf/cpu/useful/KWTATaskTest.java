@@ -1,4 +1,4 @@
-package cnn.perf;
+package cnn.perf.cpu.useful;
 
 import cnn.perf.cpu.useful.KWTATask;
 import cnn.perf.cpu.useful.ThreadPool;
