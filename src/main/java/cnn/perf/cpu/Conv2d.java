@@ -22,7 +22,7 @@ public class Conv2d implements Conv2dInterface {
      * @param bw the bias weights.
      * @return the output.
      */
-    public INDArray conv2d(ConfConv2d conf, INDArray x, INDArray w, INDArray bw) {
+    public INDArray activation(ConfConv2d conf, INDArray x, INDArray w, INDArray bw) {
         // Compute the number of vertical and horizontal position.
         long nr = x.shape()[2] - conf.filters()[1] + 1;
         nr = (long) Math.ceil(((double)nr) / ((double)conf.strides()[0]));

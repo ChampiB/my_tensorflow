@@ -14,11 +14,11 @@ import java.util.Arrays;
 public class Conv2d extends Layer {
 
     // Attributes.
-    private INDArray w;
-    private INDArray bw;
-    private INDArray input;
-    private INDArray z;
-    private INDArray y;
+    private INDArray w     = Nd4j.empty();
+    private INDArray bw    = Nd4j.empty();
+    private INDArray input = Nd4j.empty();
+    private INDArray z     = Nd4j.empty();
+    private INDArray y     = Nd4j.empty();
     private ConfConv2d conf;
 
     // Operators
@@ -72,9 +72,9 @@ public class Conv2d extends Layer {
     public INDArray activation(INDArray x, boolean training) {
         if (w.isEmpty() || bw.isEmpty())
             createWeights(x.shape());
-        z = conv2d.conv2d(conf, x, w, bw);
+        z = conv2d.activation(conf, x, w, bw);
         if (conf.useKWTA())
-            z = kwta.kwta(conf, z);
+            z = kwta.activation(conf, z);
         if (training)
             input = x;
         y = Activation.get(conf.activationFunction()).apply(z);

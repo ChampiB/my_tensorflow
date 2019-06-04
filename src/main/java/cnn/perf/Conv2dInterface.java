@@ -4,7 +4,7 @@ import cnn.layers.conf.ConfConv2d;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
 public interface Conv2dInterface {
-    INDArray conv2d(ConfConv2d conf, INDArray x, INDArray w, INDArray bw);
+    INDArray activation(ConfConv2d conf, INDArray x, INDArray w, INDArray bw);
 
     INDArray inputsGradients(ConfConv2d conf, long[] yShape, INDArray w, INDArray g);
 
