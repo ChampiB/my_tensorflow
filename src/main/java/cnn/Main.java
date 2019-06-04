@@ -5,6 +5,9 @@ import cnn.layers.Dense;
 import cnn.dataset.MnistDataSet;
 import cnn.layers.Flatten;
 import cnn.layers.MaxPooling2d;
+import cnn.layers.conf.ConfConv2d;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 public class Main {
 
@@ -14,33 +17,32 @@ public class Main {
      */
     public static void main(String[] args) {
         // Create data set and neural networks.
-        MnistDataSet mnist = new MnistDataSet(123, 20, 28, 28);
+        MnistDataSet mnist = new MnistDataSet(20, 28, 28);
 
         int outputSize = 10;
 
-        NeuralNetwork cnn = new NeuralNetwork()
-                .addLayer(new Conv2d())
+        // NeuralNetwork cnn = new NeuralNetwork()
+        //         .addLayer(new Conv2d())
+        //         .addLayer(new MaxPooling2d())
+        //         .addLayer(new Flatten())
+        //         .addLayer(new Dense(outputSize));
+
+        NeuralNetwork hcnn = new NeuralNetwork()
+                .addLayer(new Conv2d(new ConfConv2d(3, 0.01)))
                 .addLayer(new MaxPooling2d())
                 .addLayer(new Flatten())
                 .addLayer(new Dense(outputSize));
 
-        // TODO NeuralNetwork hcnn = new NeuralNetwork()
-        // TODO         .addLayer(new Conv2d(new ConfConv2d(3, 0.5)))
-        // TODO         .addLayer(new MaxPooling2d())
-        // TODO         .addLayer(new Flatten())
-        // TODO         .addLayer(new Dense(outputSize));
-
         // Training phase.
         double lr = 0.01;
-        cnn.fit(mnist, lr, 10, 100);
-        // TODO hcnn.fit(mnist, lr, 1, 10);
+        // cnn.fit(mnist, lr, 10, 100);
+        hcnn.fit(mnist, lr, 1, 100);
 
         // Testing phase.
-        cnn.evaluate(mnist);
-        // TODO hcnn.evaluate(mnist);
+        // cnn.evaluate(mnist);
+        hcnn.evaluate(mnist);
 
         // Inform me by email.
-        // TODO
         //  MailHelper.sendTrainingIsOver();
     }
 }

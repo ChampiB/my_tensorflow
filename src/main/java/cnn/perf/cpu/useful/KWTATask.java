@@ -1,4 +1,4 @@
-package cnn.perf;
+package cnn.perf.cpu.useful;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.indexaccum.IAMin;
