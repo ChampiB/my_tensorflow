@@ -1,7 +1,7 @@
 package cnn.layers;
 
-import cnn.perf.MaxPooling2dInterface;
-import cnn.perf.TasksFactory;
+import cnn.layers.perf.MaxPooling2dInterface;
+import cnn.layers.perf.TasksFactory;
 import org.apache.commons.lang3.tuple.Pair;
 import org.nd4j.linalg.api.ndarray.INDArray;
 

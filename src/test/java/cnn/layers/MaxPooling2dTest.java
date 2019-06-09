@@ -41,6 +41,7 @@ class MaxPooling2dTest {
                 {0, 0, 0, 0},
                 {3, 0, 0, 4}
         }}});
+
         for (int vi = 0; vi < t.shape()[2]; vi++) {
             for (int hi = 0; hi < t.shape()[3]; hi++) {
                 assertEquals(t.getDouble(0, 0, vi, hi), gradient.getDouble(0, 0, vi, hi));

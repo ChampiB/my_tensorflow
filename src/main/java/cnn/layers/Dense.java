@@ -1,6 +1,8 @@
 package cnn.layers;
 
 import cnn.layers.activation.Activation;
+import cnn.layers.perf.DenseInterface;
+import cnn.layers.perf.TasksFactory;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
@@ -14,6 +16,7 @@ public class Dense extends Layer {
     private INDArray input = null;
     private INDArray z = null;
     private Activation.Type af;
+    private DenseInterface dense;
 
     /**
      * Create a fully connected layer.
@@ -23,6 +26,7 @@ public class Dense extends Layer {
     public Dense(int outputSize, Activation.Type af) {
         this.af = af;
         this.outputSize = outputSize;
+        this.dense = TasksFactory.create("Dense");
     }
 
     /**
@@ -52,23 +56,11 @@ public class Dense extends Layer {
     public INDArray activation(INDArray x, boolean training) {
         if (w == null)
             w = createWeights(x.shape());
-        x = Nd4j.concat(1, Nd4j.ones(x.shape()[0], 1), x);
+        x = Nd4j.concat(1, Nd4j.ones(new long[]{(int)x.shape()[0], 1}), x);
         if (training)
             input = x;
-        z = x.mmul(w);
+        z = dense.activation(x, w);
         return Activation.get(af).apply(z);
-    }
-
-    /**
-     * Remove the first column corresponding to the bais input.
-     * @param a the array.
-     * @return the new array without the bias.
-     */
-    private INDArray removeBiasColumn(INDArray a) {
-        long[] offset = new long[]{(int) input.shape()[0], 0};
-        int[] shape = new int[]{(int) input.shape()[0], (int) input.shape()[1] - 1};
-        int[] stride = new int[]{1, (int) input.shape()[0]};
-        return a.subArray(offset, shape, stride);
     }
 
     /**
@@ -81,9 +73,9 @@ public class Dense extends Layer {
         // Compute the derivative of cost function with respect to the net input, i.e. Z = sum(wi*xi)
         gradient = gradient.mul(Activation.derivative(af).apply(z));
         // Compute the derivative of cost function with respect to the inputs
-        INDArray di = removeBiasColumn(gradient.mmul(w.transpose()));
+        INDArray di = dense.inputsGradients(input.shape(), w, gradient);
         // Compute the derivative of cost function with respect to the weights and update the weights
-        w = w.add(input.transpose().mmul(gradient).mul(-1 * lr));
+        w = w.add(dense.weightsGradients(w.shape(), input, gradient).mul(-1 * lr));
         return di;
     }
 

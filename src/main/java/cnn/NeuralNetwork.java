@@ -1,9 +1,8 @@
 package cnn;
 
-import cnn.dataset.MnistDataSet;
+import cnn.dataset.DataSet;
 import cnn.layers.Layer;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
 import java.util.ArrayList;
@@ -98,7 +97,7 @@ public class NeuralNetwork {
      * @param dataSet the data set.
      * @param lr the learning rate.
      */
-    public void fit(MnistDataSet dataSet, double lr) {
+    public void fit(DataSet dataSet, double lr) {
         fit(dataSet, lr, 100);
     }
 
@@ -108,16 +107,16 @@ public class NeuralNetwork {
      * @param lr the learning rate.
      * @param debug the number of iteration between each display of metrics.
      */
-    public void fit(MnistDataSet dataSet, double lr, int debug) {
+    public void fit(DataSet dataSet, double lr, int debug) {
         // Ensure that the data set is loaded.
         if (!dataSet.hasNextBatch(true))
             dataSet.reload();
         // Train the network.
         int i = 0;
         while (dataSet.hasNextBatch(true)) {
-            DataSet trainingSet = dataSet.nextBatch(true);
-            INDArray features = trainingSet.getFeatures().reshape(dataSet.batchShape());
-            INDArray labels = trainingSet.getLabels();
+            dataSet.nextBatch(true);
+            INDArray features = dataSet.getFeatures(true);
+            INDArray labels = dataSet.getLabels(true);
             INDArray predictions = activation(features, true);
             INDArray e = NeuralNetwork.SSEGradient(labels, predictions);
             update(e, lr);
@@ -137,7 +136,7 @@ public class NeuralNetwork {
      * @param lr the learning rate.
      * @param debug the number of iteration between each display of metrics.
      */
-    public void fit(MnistDataSet dataSet, double lr, int epochs, int debug) {
+    public void fit(DataSet dataSet, double lr, int epochs, int debug) {
         for (int i = 0; i < epochs; i++) {
             System.out.println("Epochs:" + (i + 1) + "/" + epochs + ".");
             fit(dataSet, lr, debug);
@@ -149,14 +148,14 @@ public class NeuralNetwork {
      * Evaluate the model on the data set.
      * @param dataSet the data set.
      */
-    public void evaluate(MnistDataSet dataSet) {
+    public void evaluate(DataSet dataSet) {
         double totalSSE = 0;
         double totalCorrect = 0;
         double n = 0;
         while (dataSet.hasNextBatch(false)) {
-            DataSet trainingSet = dataSet.nextBatch(false);
-            INDArray features = trainingSet.getFeatures().reshape(dataSet.batchShape());
-            INDArray labels = trainingSet.getLabels();
+            dataSet.nextBatch(false);
+            INDArray features = dataSet.getFeatures(true);
+            INDArray labels = dataSet.getLabels(true);
             INDArray predictions = activation(features, false);
             totalSSE += SSE(labels, predictions);
             totalCorrect += correctPredictions(labels, predictions);
