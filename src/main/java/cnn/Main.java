@@ -1,13 +1,9 @@
 package cnn;
 
 import cnn.dataset.DataSet;
-import cnn.dataset.DataSetFactory;
-import cnn.layers.Conv2d;
-import cnn.layers.Dense;
-import cnn.dataset.impl.MnistDataSet;
-import cnn.layers.Flatten;
-import cnn.layers.MaxPooling2d;
-import cnn.layers.conf.ConfConv2d;
+import cnn.dataset.DataSetsFactory;
+import cnn.layers.conf.Conv2dConf;
+import cnn.layers.conf.DenseConf;
 
 public class Main {
 
@@ -16,23 +12,31 @@ public class Main {
      * @param args program's arguments.
      */
     public static void main(String[] args) {
-        // Create data set and neural networks.
-        DataSet dataSet = DataSetFactory.create("Mnist", 20);
+        // The network's filename.
+        String file = "network.save";
 
-        NeuralNetwork network = new NeuralNetwork()
-                .addLayer(new Conv2d(new ConfConv2d(3, 0.01)))
-                .addLayer(new MaxPooling2d())
-                .addLayer(new Flatten())
-                .addLayer(new Dense(dataSet.getNumberOfClasses()));
+        // Create data set.
+        DataSet dataSet = DataSetsFactory.create("Mnist", 20);
+
+        // Create neural networks.
+        NeuralNetwork network = NeuralNetwork.load(file);
+        if (network == null) {
+            network = new NeuralNetwork()
+                    .addLayer("Conv2d", new Conv2dConf(3, 0.01))
+                    .addLayer("MaxPooling2d")
+                    .addLayer("Flatten")
+                    .addLayer("Dense", new DenseConf(100))
+                    .addLayer("Dense", new DenseConf(dataSet.getNumberOfClasses()));
+        }
 
         // Training phase.
-        double lr = 0.01;
+        double lr = 0.001;
         network.fit(dataSet, lr, 1, 100);
 
         // Testing phase.
         network.evaluate(dataSet);
 
-        // Inform me by email.
-        //  MailHelper.sendTrainingIsOver();
+        // Save network.
+        network.save(file);
     }
 }
