@@ -3,6 +3,8 @@ target/
 src/main/resources/*.enc
 src/**/*.ptx
 src/**/*.save
+*.save
+
 data/
 junit-platform-console-standalone-1.5.0-M1.jar
 lib

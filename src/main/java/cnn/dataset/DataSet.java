@@ -1,12 +1,18 @@
 package cnn.dataset;
 
-import org.nd4j.linalg.api.ndarray.INDArray;
+import cnn.useful.ArrayPtr;
 
 public abstract class DataSet {
     /**
      * Reload the data set.
      */
     public abstract void reload();
+
+    /**
+     * Reload the data set.
+     * @param training true if training data set is required and false otherwise.
+     */
+    public abstract void reload(boolean training);
 
     /**
      * Check if there is a next batch.
@@ -32,12 +38,12 @@ public abstract class DataSet {
      * @param training true if training data set is required and false otherwise.
      * @return the features.
      */
-    public abstract INDArray getFeatures(boolean training);
+    public abstract ArrayPtr getFeatures(boolean training);
 
     /**
      * Return the labels corresponding to the current batch.
      * @param training true if training data set is required and false otherwise.
      * @return the labels.
      */
-    public abstract INDArray getLabels(boolean training);
+    public abstract ArrayPtr getLabels(boolean training);
 }

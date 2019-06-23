@@ -1,5 +1,6 @@
 package cnn.dataset.impl;
 
+import cnn.useful.ArrayPtr;
 import org.deeplearning4j.datasets.fetchers.DataSetType;
 import org.deeplearning4j.datasets.iterator.impl.TinyImageNetDataSetIterator;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -72,10 +73,20 @@ public class TinyImageNetDataSet extends cnn.dataset.DataSet {
      * Reload the data set.
      */
     public void reload() {
-        this.train = getTrainingIterator();
-        this.test = getTestingIterator();
+        reload(true);
+        reload(false);
     }
 
+    /**
+     * Reload the data set.
+     */
+    public void reload(boolean training) {
+        if (training) {
+            this.train = getTrainingIterator();
+        } else {
+            this.test = getTestingIterator();
+        }
+    }
     /**
      * Check if there is a next batch.
      * @param training true if training data set is required and false otherwise.
@@ -106,7 +117,7 @@ public class TinyImageNetDataSet extends cnn.dataset.DataSet {
      * @param training true if training data set is required and false otherwise.
      * @return the features.
      */
-    public INDArray getFeatures(boolean training) {
+    public INDArray getFeaturesArray(boolean training) {
         if (training) {
             return trainSet.getFeatures().reshape(batchShape());
         } else {
@@ -115,15 +126,33 @@ public class TinyImageNetDataSet extends cnn.dataset.DataSet {
     }
 
     /**
+     * Return the features corresponding to the current batch.
+     * @param training true if training data set is required and false otherwise.
+     * @return the features.
+     */
+    public ArrayPtr getFeatures(boolean training) {
+        return new ArrayPtr(getFeaturesArray(training));
+    }
+
+    /**
      * Return the labels corresponding to the current batch.
      * @param training true if training data set is required and false otherwise.
      * @return the labels.
      */
-    public INDArray getLabels(boolean training) {
+    public INDArray getLabelsArray(boolean training) {
         if (training) {
             return trainSet.getLabels();
         } else {
             return testSet.getLabels();
         }
+    }
+
+    /**
+     * Return the labels corresponding to the current batch.
+     * @param training true if training data set is required and false otherwise.
+     * @return the labels.
+     */
+    public ArrayPtr getLabels(boolean training) {
+        return new ArrayPtr(getLabelsArray(training));
     }
 }
