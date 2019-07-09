@@ -1,18 +1,2 @@
-TODO: Small utility
-- Add regularization
-- Add softmax activation function
-- Improve precision of the metrics display during the training (Moving accuracy and SSE)
-- Implement the HDense layer
-
-TODO: Medium utility
-- Implement the dynamic dense layer.
-- Train a model on ImageNet
-- Retrieve results for the HCNN models and GPU implementation:
- (1) Model robustness, i.e. adversarial images (section 7.13) + master thesis (dropbox)
- (2) Features learned, i.e. comparison with Dropout & Neuron mining
-
 TODO: Big utility
-- Implement more complex model neural networks:
- (1) Allow non-sequential neural network
- (2) Allow network to contains networks (composite design patterns), i.e. Inception Module is a network and the GoogleNet contains many of them.
- (3) Implement ResNet, AlexNet, GoogleNet, ...
+- Retrieve results for the CNN vs HCNN models

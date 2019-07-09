@@ -1,13 +1,13 @@
 package cnn.ops.cpu;
 
-import cnn.layers.conf.Conv2dConf;
+import cnn.nodes.conf.Conv2dConf;
 import cnn.ops.CPCAInterface;
 import cnn.ops.OpsFactory;
-import cnn.useful.ArrayPtr;
+import cnn.data.ArrayPtr;
 import org.junit.jupiter.api.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
-import static cnn.TestHelper.*;
+import static cnn.helpers.TestHelper.*;
 
 class CPCATest {
 

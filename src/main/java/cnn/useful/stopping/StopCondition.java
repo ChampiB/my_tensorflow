@@ -1,8 +1,8 @@
 package cnn.useful.stopping;
 
-import cnn.NeuralNetwork;
+import cnn.graphs.Graph;
 import cnn.dataset.DataSet;
 
 public interface StopCondition {
-    boolean shouldStop(int i, NeuralNetwork nn, DataSet dataSet);
+    boolean shouldStop(int i, Graph nn, DataSet dataSet);
 }

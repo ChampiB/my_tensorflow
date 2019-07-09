@@ -1,6 +1,6 @@
 package cnn.dataset;
 
-import cnn.useful.ArrayPtr;
+import cnn.data.ArrayPtr;
 
 public abstract class DataSet {
     /**
@@ -22,7 +22,7 @@ public abstract class DataSet {
     public abstract boolean hasNextBatch(boolean training);
 
     /**
-     * Selection the next batch in the training set.
+     * Select the next batch in the training set.
      * @param training true if training data set is required and false otherwise.
      */
     public abstract void nextBatch(boolean training);

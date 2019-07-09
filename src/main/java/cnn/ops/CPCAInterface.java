@@ -1,7 +1,7 @@
 package cnn.ops;
 
-import cnn.layers.conf.Conv2dConf;
-import cnn.useful.ArrayPtr;
+import cnn.nodes.conf.Conv2dConf;
+import cnn.data.ArrayPtr;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
 public interface CPCAInterface {

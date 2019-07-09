@@ -17,6 +17,7 @@
 #define X_IMAGE_SIZE conf[12]
 #define X_CHANNEL_SIZE conf[13]
 #define X_ROW_SIZE conf[14]
+#define X_0 conf[15]
 
 /**
  * The memory shared between the threads of each block.
@@ -60,9 +61,11 @@ __global__ void weights_gradients(int *conf, float *x, float *w, float *y, float
             for (int c = y_pos.w; c < Y_3; c += blockDim.z) {
                 int rx = r * STRIDES_0 + w_pos.z;
                 int cx = c * STRIDES_1 + w_pos.w;
-                int x_index = i * X_IMAGE_SIZE + w_pos.y * X_CHANNEL_SIZE + rx * X_ROW_SIZE + cx;
                 int y_index = i * Y_IMAGE_SIZE + w_pos.x * Y_FEATURE_SIZE + r * Y_ROW_SIZE + c;
-                sdata[tid] += min(y[y_index], (float)1) * (x[x_index] - w[bid]);
+                for (int ii = 0; ii < X_0; ii++) {
+                    int x_index = ii * X_IMAGE_SIZE + w_pos.y * X_CHANNEL_SIZE + rx * X_ROW_SIZE + cx;
+                    sdata[tid] += min(y[y_index], (float)1) * (x[x_index] - w[bid]);
+                }
             }
         }
     }
@@ -85,12 +88,14 @@ __global__ void count_patterns(int *conf, float *y, float *r)
 {
     int tid = threadIdx.x * blockDim.y * blockDim.z + threadIdx.y * blockDim.z + threadIdx.z;
     sdata[tid] = 0;
-    int index = threadIdx.x * Y_IMAGE_SIZE + blockIdx.x * Y_FEATURE_SIZE + threadIdx.y * Y_ROW_SIZE + threadIdx.z;
-    for (int vo = 0; threadIdx.y + vo < Y_2; vo += blockDim.y) {
-        for (int ho = 0; threadIdx.z + ho < Y_3; ho += blockDim.z) {
-            int y_index = index + vo * Y_3 + ho;
-            if (y[y_index] != 0)
-                sdata[tid] += 1;
+    for (int ii = threadIdx.x; threadIdx.x + ii < X_0; ii += blockDim.x) {
+        int index = ii * Y_IMAGE_SIZE + blockIdx.x * Y_FEATURE_SIZE + threadIdx.y * Y_ROW_SIZE + threadIdx.z;
+        for (int vo = 0; threadIdx.y + vo < Y_2; vo += blockDim.y) {
+            for (int ho = 0; threadIdx.z + ho < Y_3; ho += blockDim.z) {
+                int y_index = index + vo * Y_3 + ho;
+                if (y[y_index] != 0)
+                    sdata[tid] += 1;
+            }
         }
     }
     __syncthreads();

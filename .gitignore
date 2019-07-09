@@ -4,8 +4,8 @@ src/main/resources/*.enc
 src/**/*.ptx
 src/**/*.save
 *.save
+imagenet/
 
-data/
 junit-platform-console-standalone-1.5.0-M1.jar
 lib
 
@@ -25,3 +25,8 @@ papers/**/*.acr
 papers/**/*.alg
 papers/**/*.glg
 papers/**/*.gls
+papers/**/*.pygtex
+papers/**/*.dvi
+papers/**/*.lot
+papers/**/*.lof
+papers/**/*.pygstyle
