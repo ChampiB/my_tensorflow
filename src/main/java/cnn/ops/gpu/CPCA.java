@@ -1,21 +1,22 @@
 package cnn.ops.gpu;
 
-import cnn.useful.ArrayPtr;
+import cnn.data.ArrayPtr;
+import cnn.data.ArrayPtrFactory;
 import jcuda.Sizeof;
-import cnn.layers.conf.Conv2dConf;
+import cnn.nodes.conf.Conv2dConf;
 import cnn.ops.CPCAInterface;
-import cnn.useful.gpu.GPUTask;
+import cnn.useful.gpu.GPUNode;
 import jcuda.Pointer;
+import jcuda.driver.CUfunction;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
-public class CPCA extends GPUTask implements CPCAInterface {
+import java.util.Map;
 
-    /**
-     * Default constructor.
-     */
-    public CPCA() {
-        super(GPUTask.OPS_PATH, "cpca.cu", new String[]{"weights_gradients", "count_patterns"});
-    }
+public class CPCA implements CPCAInterface {
+
+    private final Map<String, CUfunction> functions = GPUNode.loadFunctions(GPUNode.OPS_PATH, "cpca.cu", new String[]{"weights_gradients", "count_patterns"});
+
+    public CPCA() {}
 
     /**
      * Normalize the CPCA gradients.
@@ -40,11 +41,11 @@ public class CPCA extends GPUTask implements CPCAInterface {
      */
     private ArrayPtr computeGradients(ArrayPtr c, int[] conf, long[] shape, ArrayPtr x, ArrayPtr w, ArrayPtr y) {
         // Allocate device output memory.
-        ArrayPtr rgpu = new ArrayPtr(shape, Sizeof.FLOAT);
+        ArrayPtr rgpu = ArrayPtrFactory.empty(shape, Sizeof.FLOAT);
         // Create kernel parameters.
         Pointer parameters = Pointer.to(c.toPTR(), x.toPTR(), w.toPTR(), y.toPTR(), rgpu.toPTR());
-        execute(
-                "weights_gradients", parameters,
+        GPUNode.execute(
+                functions.get("weights_gradients"), parameters,
                 conf[8] * conf[9], conf[10], conf[11],
                 5, 10, 10,
                 500 * Sizeof.FLOAT
@@ -60,11 +61,11 @@ public class CPCA extends GPUTask implements CPCAInterface {
      */
     private ArrayPtr countPatterns(ArrayPtr cgpu, int[] conf, int size, ArrayPtr ygpu) {
         // Allocate device output memory.
-        ArrayPtr rgpu = new ArrayPtr(new long[]{size}, Sizeof.FLOAT);
+        ArrayPtr rgpu = ArrayPtrFactory.empty(new long[]{size}, Sizeof.FLOAT);
         // Create kernel parameters.
         Pointer parameters = Pointer.to(cgpu.toPTR(), ygpu.toPTR(), rgpu.toPTR());
-        execute(
-                "count_patterns", parameters,
+        GPUNode.execute(
+                functions.get("count_patterns"), parameters,
                 conf[3], 1, 1,
                 conf[2], 5, 5,
                 conf[2] * 25 * Sizeof.FLOAT
@@ -104,7 +105,7 @@ public class CPCA extends GPUTask implements CPCAInterface {
         // Create the kernel's configuration.
         int[] config = createConf(conf, x.getShape(), w.getShape(), y.getShape());
         // Allocate the device input data, and copy the host input data to the device.
-        ArrayPtr cgpu = new ArrayPtr(config, true);
+        ArrayPtr cgpu = ArrayPtrFactory.fromData(config, true);
         // Execute kernels.
         ArrayPtr dw = computeGradients(cgpu, config, w.getShape(), x, w, y);
         ArrayPtr fc = countPatterns(cgpu, config, (int)w.getShape()[0], y);

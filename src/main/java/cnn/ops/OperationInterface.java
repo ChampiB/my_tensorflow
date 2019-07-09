@@ -1,6 +1,6 @@
 package cnn.ops;
 
-import cnn.useful.ArrayPtr;
+import cnn.data.ArrayPtr;
 
 public interface OperationInterface {
     int argMax(ArrayPtr a, int row);

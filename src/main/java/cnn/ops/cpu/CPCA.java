@@ -1,8 +1,9 @@
 package cnn.ops.cpu;
 
-import cnn.layers.conf.Conv2dConf;
+import cnn.data.ArrayPtrFactory;
+import cnn.nodes.conf.Conv2dConf;
 import cnn.ops.CPCAInterface;
-import cnn.useful.ArrayPtr;
+import cnn.data.ArrayPtr;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
@@ -10,8 +11,8 @@ import org.nd4j.linalg.indexing.NDArrayIndex;
 
 public class CPCA implements CPCAInterface {
 
-    private ArrayPtr dwcpca = new ArrayPtr(false);
-    private ArrayPtr fc = new ArrayPtr(false);
+    private ArrayPtr dwcpca = ArrayPtrFactory.empty(false);
+    private ArrayPtr fc = ArrayPtrFactory.empty(false);
 
     /**
      * Normalize the CPCA gradients.
@@ -33,8 +34,8 @@ public class CPCA implements CPCAInterface {
      * @return the gradients.
      */
     public INDArray weightsGradients(Conv2dConf conf, ArrayPtr x, ArrayPtr w, ArrayPtr y) {
-        dwcpca = new ArrayPtr(Nd4j.zeros(w.getShape()));
-        fc = new ArrayPtr(Nd4j.zeros(y.getShape()[1]));
+        dwcpca = ArrayPtrFactory.fromData(Nd4j.zeros(w.getShape()));
+        fc = ArrayPtrFactory.fromData(Nd4j.zeros(y.getShape()[1]));
         for (int fi = 0; fi < y.getShape()[1]; fi++) {
             for (int ii = 0; ii < y.getShape()[0]; ii++) {
                 INDArray weights = w.toCPU().slice(fi);

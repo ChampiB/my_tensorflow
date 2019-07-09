@@ -1,6 +1,6 @@
 package cnn.useful.stopping;
 
-import cnn.NeuralNetwork;
+import cnn.graphs.Graph;
 import cnn.dataset.DataSet;
 
 public class EpochsStopCondition implements StopCondition {
@@ -14,7 +14,7 @@ public class EpochsStopCondition implements StopCondition {
     }
 
     @Override
-    public boolean shouldStop(int i, NeuralNetwork nn, DataSet dataSet) {
+    public boolean shouldStop(int i, Graph nn, DataSet dataSet) {
         if (i == 0 || !dataSet.hasNextBatch(true)) {
             dataSet.reload();
             n++;

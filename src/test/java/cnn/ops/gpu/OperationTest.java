@@ -1,16 +1,16 @@
 package cnn.ops.gpu;
 
-import cnn.TestHelper;
+import cnn.helpers.TestHelper;
 import cnn.ops.OperationInterface;
 import cnn.ops.OpsFactory;
-import cnn.useful.ArrayPtr;
+import cnn.data.ArrayPtr;
 import org.junit.jupiter.api.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static cnn.TestHelper.create;
+import static cnn.helpers.TestHelper.create;
 
 class OperationTest {
 

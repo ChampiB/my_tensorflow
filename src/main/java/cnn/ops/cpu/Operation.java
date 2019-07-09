@@ -1,7 +1,7 @@
 package cnn.ops.cpu;
 
 import cnn.ops.OperationInterface;
-import cnn.useful.ArrayPtr;
+import cnn.data.ArrayPtr;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
 public class Operation implements OperationInterface {

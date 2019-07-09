@@ -1,6 +1,7 @@
 package cnn.dataset.impl;
 
-import cnn.useful.ArrayPtr;
+import cnn.data.ArrayPtr;
+import cnn.data.ArrayPtrFactory;
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -131,7 +132,7 @@ public class MnistDataSet extends cnn.dataset.DataSet {
      * @return the features.
      */
     public ArrayPtr getFeatures(boolean training) {
-        return new ArrayPtr(getFeaturesArray(training));
+        return ArrayPtrFactory.fromData(getFeaturesArray(training));
     }
 
     /**
@@ -153,7 +154,7 @@ public class MnistDataSet extends cnn.dataset.DataSet {
      * @return the labels.
      */
     public ArrayPtr getLabels(boolean training) {
-        return new ArrayPtr(getLabelsArray(training));
+        return ArrayPtrFactory.fromData(getLabelsArray(training));
     }
 
     /**

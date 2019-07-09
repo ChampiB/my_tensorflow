@@ -1,6 +1,6 @@
 package cnn.dataset;
 
-import cnn.useful.ArrayPtr;
+import cnn.data.ArrayPtr;
 
 public abstract class DataSet {
     /**

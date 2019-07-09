@@ -1,6 +1,6 @@
 package cnn.dataset;
 
-import cnn.layers.LayersFactory;
+import cnn.nodes.NodesFactory;
 
 public class DataSetsFactory {
     /**
@@ -11,7 +11,7 @@ public class DataSetsFactory {
      * @throws Exception if an error occurred.
      */
     static private DataSet loadInstance(String name, int batchSize) throws Exception {
-        return (DataSet) LayersFactory.class.getClassLoader()
+        return (DataSet) NodesFactory.class.getClassLoader()
                 .loadClass("cnn.dataset.impl." + name + "DataSet")
                 .getDeclaredConstructor(int.class)
                 .newInstance(batchSize);

@@ -75,11 +75,11 @@ Image analysis is the field that aims to extract meaning from images. This is an
 
 \section{Convolutional Neural Network}
 
-The \acrshort{cnn} or \acrshort{conv_net} architecture \cite{NIPS1989_293} is a deep neural network learning by backpropagation. It is composed of two kind of layers: convoltion and pooling. The convolution layer contains kernels that will be slide through the image with step size defined by the strides. In recent implementation \cite{5537907} non-linear activation is added after the weighted sum produce by the kernels such as:
+The \acrshort{cnn} or \acrshort{conv_net} architecture \cite{NIPS1989_293} is a deep neural network learning by backpropagation. It is composed of two kind of nodes: convoltion and pooling. The convolution node contains kernels that will be slide through the image with step size defined by the strides. In recent implementation \cite{5537907} non-linear activation is added after the weighted sum produce by the kernels such as:
 \begin{equation}
 y_{convolution} = \sigma(z)\ \ \ with\ \ \ z = \sum_{i} x_i \times w_i
 \end{equation}
-where $y$ is the kernel's output for a specific position in the image, $i$ iterate through all the input as show by the indexes in figure \ref{fig:conv_net}, $x$ are the inputs, $w$ are the kernel's weights and $\sigma$ is the non-linear activation function. Also, the use of local normalization allows local competition between the kernels. The pooling layer allow to reduce the dimensionality and making the model invariant to small local variation of its inputs. In the original version \textcite{NIPS1989_293} the pooling applied local average, i.e. mean pooling. More recently, the max pooling have shown better results \cite{10.1007/978-3-642-15825-4_10} by taking the highest value from the pooling kernel such as:
+where $y$ is the kernel's output for a specific position in the image, $i$ iterate through all the input as show by the indexes in figure \ref{fig:conv_net}, $x$ are the inputs, $w$ are the kernel's weights and $\sigma$ is the non-linear activation function. Also, the use of local normalization allows local competition between the kernels. The pooling node allow to reduce the dimensionality and making the model invariant to small local variation of its inputs. In the original version \textcite{NIPS1989_293} the pooling applied local average, i.e. mean pooling. More recently, the max pooling have shown better results \cite{10.1007/978-3-642-15825-4_10} by taking the highest value from the pooling kernel such as:
 \begin{equation}
 y_{mean}\ =\ \frac{1}{|x|}\ \times\ \sum_{i} x_i\ \ \ and\ \ \ y_{max}\ =\ \max_{i}\ x_i
 \end{equation}
@@ -88,16 +88,16 @@ where $y_{mean}$ and $y_{max}$ are the output of the mean and max pooling for a 
 \begin{figure}[h]
 \centering
 \includegraphics[width=12cm, height=7cm]{conv_net}
-\caption{This figure illustrates the convoltion and pooling layers of the \acrshort{conv_net}. In this example there is two kernels of size 2x2 with stride 1x1, which produce two feature maps. Each element in the feature maps are produced by taking the weighted sum of the kernel's input and passing the result through a non-linear activation function. Then the 2x2 max pooling is applied to each feature map to produce the final output.}
+\caption{This figure illustrates the convoltion and pooling nodes of the \acrshort{conv_net}. In this example there is two kernels of size 2x2 with stride 1x1, which produce two feature maps. Each element in the feature maps are produced by taking the weighted sum of the kernel's input and passing the result through a non-linear activation function. Then the 2x2 max pooling is applied to each feature map to produce the final output.}
 \label{fig:conv_net}
 \end{figure}
 \section{Deep \acrshort{conv_net}}
 
 This section aims to motivate the improvement of the \acrshort{conv_net} by giving an overview of the varity of model based on it and the multitude of application domains.
 
-\paragraph{Object detection:} Object detection is the field dedictated to the recognition of objects inside images. Over the recent years many models have been proposed to pull the error on the ImageNet data set \cite{imagenet_cvpr09} down. It started with the VGGNet \cite{DBLP:journals/corr/RussakovskyDSKSMHKKBBF14} and the AlexNet \cite{DBLP:journals/cacm/KrizhevskySH17}, which are simply deeper \acrshort{cnn}s. Then the GoogleNet \cite{DBLP:conf/cvpr/SzegedyLJSRAEVR15} introduced the Inception Module, which is able to extract multi-level features from the same input. Indeed, the Inception Module is using kernels of various size, i.e. 1x1, 3x3 and 5x5, to extract features from its inputs. Finally, the ResNet architechture \cite{DBLP:conf/cvpr/HeZRS16} introduced the idea of skip connections where some connections are directly linked to other layers much higer in the hierachy. The lastest archieved a top-5 error rate of 3.57\% on the ImageNet data set, which is composed of 1000 classes of objects.\newline
+\paragraph{Object detection:} Object detection is the field dedictated to the recognition of objects inside images. Over the recent years many models have been proposed to pull the error on the ImageNet data set \cite{imagenet_cvpr09} down. It started with the VGGNet \cite{DBLP:journals/corr/RussakovskyDSKSMHKKBBF14} and the AlexNet \cite{DBLP:journals/cacm/KrizhevskySH17}, which are simply deeper \acrshort{cnn}s. Then the GoogleNet \cite{DBLP:conf/cvpr/SzegedyLJSRAEVR15} introduced the Inception Module, which is able to extract multi-level features from the same input. Indeed, the Inception Module is using kernels of various size, i.e. 1x1, 3x3 and 5x5, to extract features from its inputs. Finally, the ResNet architechture \cite{DBLP:conf/cvpr/HeZRS16} introduced the idea of skip connections where some connections are directly linked to other nodes much higer in the hierachy. The lastest archieved a top-5 error rate of 3.57\% on the ImageNet data set, which is composed of 1000 classes of objects.\newline
 
-\noindent All those models shared the same building blocks (i.e. convolution and pooling layers) and have been successfully applied to the extraction of text from images, face recognition and scence understanding for autonomous vehicles.
+\noindent All those models shared the same building blocks (i.e. convolution and pooling nodes) and have been successfully applied to the extraction of text from images, face recognition and scence understanding for autonomous vehicles.
 
 \paragraph{Image segmentation:} Image segmentation is another important task in computer vision, which constists of a pixelwise binary prediction. The model is trained to predict one for all pixels that belongs to a class and zero otherwise. The state-of-the-art in image segmentation are architechture like UNet \cite{DBLP:conf/miccai/RonnebergerFB15} and LinkNet \cite{DBLP:conf/vcip/ChaurasiaC17}. Those architecture are composed of two parts, i.e. an encoder and a decoder. The encoder tranform the input image into a more compact representation that can then be unfold by the decoder to produce the final output.\newline
 
@@ -140,7 +140,7 @@ The following explanation are based on the chapter 4 of \textcite{OReilly:2000:C
 
 \section{K-Winner-Take-All} \label{sec:kwta}
 
-The need for a conditioning function in \acrshort{cpca} have been highlighted in the previous section. This section presents the k-Winner-Take-All method that enable such conditioning. The k-Winner-Take-All aims to make only a subset of $k$ neurons to be active for each input. This can be archieved by either inhibiting all the neurons until only $k$ of them remaind active or by forcing the activation to $n - k$ neurons to zero, where $n$ is the total number of neuron in the layer.\newline
+The need for a conditioning function in \acrshort{cpca} have been highlighted in the previous section. This section presents the k-Winner-Take-All method that enable such conditioning. The k-Winner-Take-All aims to make only a subset of $k$ neurons to be active for each input. This can be archieved by either inhibiting all the neurons until only $k$ of them remaind active or by forcing the activation to $n - k$ neurons to zero, where $n$ is the total number of neuron in the node.\newline
 
 Independently of the method chosen only the $k$ neurons which have the highest activation will remaind active. Those neurons are the ones whose weights fitted the best the input pattern. Since, the learning rule in \acrshort{cpca} is making the weights tends to $P(x_i = 1 | y_j = 1)$, then those neurons will fit the input even better. Finally, the last point of this section will be to explain how \acrshort{cpca} and \acrshort{kwta} are related to the figure \ref{fig:heterogeneous_data} (b). By now, it should be clear that \acrshort{kwta} will enable a neuron to ignore the bottom-most cluster if its weights does not fit it well. Additionally, the \acrshort{cpca} learning rule will allows the neuron to both fit the top-most cluster even better and learn a useful representation of the input for which it is reponsible.
 
@@ -161,12 +161,12 @@ The idea of mixing hebbian learning and backpropagation have already been propos
 where $\Delta_{weights}$ is the final update of the weights, $\epsilon$ is the learning rate, $ratio$ is the amount of hebbian learning between zero and one, $\Delta_{hebbian}$ is hebbian update of the weights and $\Delta_{backpropagation}$ is backpropagation update of the weights. Finally, a reasonable value for the $ratio$ of hebbian is between $0.0005$ and $0.01$.
 
 \subsection{\acrshort{cnn} with \acrshort{cpca} and \acrshort{kwta}:}
-The previous subsection explained how to mix hebbian learning and backpropagation. Also, this paragraph describe a new model, i.e. \acrshort{hcnn}, obtained by mixing a \acrshort{cnn} with \acrshort{cpca} and \acrshort{kwta}. The only layer that is modified in this model is the convolutional layer. As explained in section \ref{sec:mix_hebb_bp} the final weights update will be a mix between the \acrshort{cpca} and the backpropagation gradients. Additionaly, as explained in section \ref{sec:kwta} \acrshort{cpca} required a conditionning function to learn efficiently. This will be archieve using a \acrshort{kwta} competition between the neurons of the convolutional layer. Figure \ref{fig:hcnn} shows the convolutional layer with \acrshort{cpca} and \acrshort{kwta}.
+The previous subsection explained how to mix hebbian learning and backpropagation. Also, this paragraph describe a new model, i.e. \acrshort{hcnn}, obtained by mixing a \acrshort{cnn} with \acrshort{cpca} and \acrshort{kwta}. The only node that is modified in this model is the convolutional node. As explained in section \ref{sec:mix_hebb_bp} the final weights update will be a mix between the \acrshort{cpca} and the backpropagation gradients. Additionaly, as explained in section \ref{sec:kwta} \acrshort{cpca} required a conditionning function to learn efficiently. This will be archieve using a \acrshort{kwta} competition between the neurons of the convolutional node. Figure \ref{fig:hcnn} shows the convolutional node with \acrshort{cpca} and \acrshort{kwta}.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=15cm, height=10cm]{hcnn}
-\caption{This figure illustrate the convolutional layer of the \acrlong{hcnn}. The inputs are the same for all the kernel. The weights are used to computed the weighted sum of the inputs and the result is passed through a non-linear activation function. Then, the \acrshort{kwta} ensure that only two neurons win the competition and set the activation of the orange kernel to zero. Finally, the gradients of the backpropagation and \acrshort{cpca} are computed and mixed using the equation presented in section \ref{sec:mix_hebb_bp}.}
+\caption{This figure illustrate the convolutional node of the \acrlong{hcnn}. The inputs are the same for all the kernel. The weights are used to computed the weighted sum of the inputs and the result is passed through a non-linear activation function. Then, the \acrshort{kwta} ensure that only two neurons win the competition and set the activation of the orange kernel to zero. Finally, the gradients of the backpropagation and \acrshort{cpca} are computed and mixed using the equation presented in section \ref{sec:mix_hebb_bp}.}
 \label{fig:hcnn}
 \end{figure}
 
@@ -194,49 +194,49 @@ $$DataSet dataSet = DataSetFactory.create("Mnist", 20);$$
 	\item $getLabels$ which return the labels of the current batch.
 \end{itemize}
 
-\section{Layers} \label{sec:layers}
+\section{Layers} \label{sec:nodes}
 
-The code also provide a layer interface, which can be used to add support for new layers. As we will see in the next section, this generic interface allows the neural network to easily stack layers on top of each other. The layer interface is composed of three functions:
+The code also provide a node interface, which can be used to add support for new nodes. As we will see in the next section, this generic interface allows the neural network to easily stack nodes on top of each other. The node interface is composed of three functions:
 \begin{itemize}
-	\item $activation$ which compute the layer activation, i.e. forward pass;
+	\item $activation$ which compute the node activation, i.e. forward pass;
 	\item $update$ which update the weights, i.e. backward pass;
-	\item $print$ which display the layer on the standard output.
+	\item $print$ which display the node on the standard output.
 \end{itemize}
 
-\noindent The framework currently support the following layers:
+\noindent The framework currently support the following nodes:
 \begin{itemize}
-	\item $Dense$ which is a fully connected layer;
-	\item $Conv2d$ which is a 2D convolutional layer supporting \acrshort{cpca} and  \acrshort{kwta};
-	\item $MaxPooling2d$ which is a 2D max pooling layer;
+	\item $Dense$ which is a fully connected node;
+	\item $Conv2d$ which is a 2D convolutional node supporting \acrshort{cpca} and  \acrshort{kwta};
+	\item $MaxPooling2d$ which is a 2D max pooling node;
 	\item $Flaten$ which transform a multi-dimensional data into a flat representation.
 \end{itemize}
 
-\noindent The following subsections focus on explaining the backpropagation of each layer.
+\noindent The following subsections focus on explaining the backpropagation of each node.
 
-\subsection{Flaten layer}
+\subsection{Flaten node}
 
-The flatten layer simply reshape the data for example if the input is a 3x3 matrix the layer flatten it as a vector of size 9. During the backpropagation the layer will receive the derivative of the error function with respect to the each output neuron, i.e. a vector of size 9. This layer does not have any weights and will just return the derivative of the error function with respect to the input, i.e. the vector of size 9 is reshape and a 3x3 matrix is returned.
+The flatten node simply reshape the data for example if the input is a 3x3 matrix the node flatten it as a vector of size 9. During the backpropagation the node will receive the derivative of the error function with respect to the each output neuron, i.e. a vector of size 9. This node does not have any weights and will just return the derivative of the error function with respect to the input, i.e. the vector of size 9 is reshape and a 3x3 matrix is returned.
 
-\subsection{MaxPooling2d layer}
+\subsection{MaxPooling2d node}
 
-The max pooling is quite similar to the flatten layer, because it does not have any weights to update. During the forward pass the layer keep in memory the mask that will be used to backpropagate the gradients. This mask has the same shape as the input and contains a one if the cell was the highest value of the pooling kernel and zero otherwise. Assuming a 2x2 max pooling layer and a 4x4 input matrix the layer will output a 2x2 matrix and keep in memory a 4x4 mask matrix. During the backward pass the layer received a 2x2 matrix containing the derivative of the error function with respect to the each output neuron. The gradient are backpropagate by using the mask, indeed, each pooling kernel of the mask is multiplied by the corresponding gradient as sown in figure \ref{fig:max_pooling_bp}.
+The max pooling is quite similar to the flatten node, because it does not have any weights to update. During the forward pass the node keep in memory the mask that will be used to backpropagate the gradients. This mask has the same shape as the input and contains a one if the cell was the highest value of the pooling kernel and zero otherwise. Assuming a 2x2 max pooling node and a 4x4 input matrix the node will output a 2x2 matrix and keep in memory a 4x4 mask matrix. During the backward pass the node received a 2x2 matrix containing the derivative of the error function with respect to the each output neuron. The gradient are backpropagate by using the mask, indeed, each pooling kernel of the mask is multiplied by the corresponding gradient as sown in figure \ref{fig:max_pooling_bp}.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=4.5cm, height=5cm]{max_pooling_bp}
-\caption{This figure illustrate the forward and backward pass of the max pooling layer. The blue matrix is the input data, the green is the layer output and the orange one is the mask corresponding to the input. Finally, the purple matrix is the matrix containing the derivative with respect to the output of the neurons and the red one contains the derivative with respect to the input.}
+\caption{This figure illustrate the forward and backward pass of the max pooling node. The blue matrix is the input data, the green is the node output and the orange one is the mask corresponding to the input. Finally, the purple matrix is the matrix containing the derivative with respect to the output of the neurons and the red one contains the derivative with respect to the input.}
 \label{fig:max_pooling_bp}
 \end{figure}
 
-\subsection{Dense layer}
+\subsection{Dense node}
 
-The dense layer is more interresting, because of two reasons. First, the layer has weights to update, which required to compute the derivative with respect to the weights in addition to the derivative with respect to the inputs. Second, the layer has an activation function that makes the problem a bit more difficult. The first notion required to correctly explained the backpropagation in a dense layer is known as the chain rule, which is defined by:
+The dense node is more interresting, because of two reasons. First, the node has weights to update, which required to compute the derivative with respect to the weights in addition to the derivative with respect to the inputs. Second, the node has an activation function that makes the problem a bit more difficult. The first notion required to correctly explained the backpropagation in a dense node is known as the chain rule, which is defined by:
 
 \begin{equation}
 \frac{\delta z}{\delta x} = \frac{\delta z}{\delta y} \times \frac{\delta y}{\delta x}
 \end{equation}
 
-\noindent where $z$ is a function of $y$ and $y$ a function of $x$. In a dense layer each neuron $j$ is computed its net input $z_j$ as a weighted sum of its inputs such as:
+\noindent where $z$ is a function of $y$ and $y$ a function of $x$. In a dense node each neuron $j$ is computed its net input $z_j$ as a weighted sum of its inputs such as:
 
 \begin{equation}
 z_j = \sum_{i}{x_i \times w_{ij}}
@@ -248,23 +248,23 @@ z_j = \sum_{i}{x_i \times w_{ij}}
 y_j = \sigma(z_j)
 \end{equation}
 
-\noindent where $y_j$ is the activation of the j-th neuron. During the backpropagation the layer needs to determined the derivative of the error function with respect to the weights and the inputs. The chain rules give us the following for the weights:
+\noindent where $y_j$ is the activation of the j-th neuron. During the backpropagation the node needs to determined the derivative of the error function with respect to the weights and the inputs. The chain rules give us the following for the weights:
 
 \begin{equation}
 \frac{\delta e}{\delta w_{ij}} = \frac{\delta e}{\delta y_j} \times \frac{\delta y_j}{\delta z_j} \times \frac{\delta z_j}{\delta w_{ij}}
 \end{equation}
 
-\noindent where $\frac{\delta e}{\delta y_j}$ is the derivative of the error function with respect to the activation of the output of the j-th neuron. The derivative of the error function with respect to the input is a bit more complexe, because it required to sum over all the output neurons of the layer.
+\noindent where $\frac{\delta e}{\delta y_j}$ is the derivative of the error function with respect to the activation of the output of the j-th neuron. The derivative of the error function with respect to the input is a bit more complexe, because it required to sum over all the output neurons of the node.
 
 \begin{equation}
 \frac{\delta e}{\delta x_{i}} = \sum_{j} \frac{\delta e}{\delta y_j} \times \frac{\delta y_j}{\delta z_j} \times \frac{\delta z_j}{\delta x_i}
 \end{equation}
 
-\noindent The derivative of the error function with respect to the weights will be used to update the weights and the derivative with respect to the inputs will be used as the derivative with respect to the output of the previous layer.
+\noindent The derivative of the error function with respect to the weights will be used to update the weights and the derivative with respect to the inputs will be used as the derivative with respect to the output of the previous node.
 
-\subsection{Conv2d layer} \label{sec:conv2d}
+\subsection{Conv2d node} \label{sec:conv2d}
 
-This section has two objectives. First, it aims to explain the backpropagation in convolutional layers. Second, it aims to explains how to compute the \acrshort{cpca} gradients. Let's start with the computation of the backpropagation gradients for both the weights and the inputs. The only difference for the computation of the weights' gradients is the appearance of a sum over all the positions of the image where the weights have been applied:
+This section has two objectives. First, it aims to explain the backpropagation in convolutional nodes. Second, it aims to explains how to compute the \acrshort{cpca} gradients. Let's start with the computation of the backpropagation gradients for both the weights and the inputs. The only difference for the computation of the weights' gradients is the appearance of a sum over all the positions of the image where the weights have been applied:
 
 \begin{equation} \label{eq:dwc2d}
 \frac{\delta e}{\delta w_{ij}} = \sum_{k} \frac{\delta e}{\delta y_{jk}} \times \frac{\delta y_{jk}}{\delta z_{jk}} \times \frac{\delta z_{jk}}{\delta w_{ijk}}
@@ -281,11 +281,11 @@ This section has two objectives. First, it aims to explain the backpropagation i
 \begin{figure}[h]
 \centering
 \includegraphics[width=10cm, height=8cm]{k_weights_vs_inputs}
-\caption{This figure aims to clarify the meaning of the indexes $k$ and $l$. (a) The index $k$ iterate through all the positions of the input image taking steps whose size are defined by the strides of the layer. (b) The index $l$ iterate through all the positions where the kernel contains the input $x_i$.}
+\caption{This figure aims to clarify the meaning of the indexes $k$ and $l$. (a) The index $k$ iterate through all the positions of the input image taking steps whose size are defined by the strides of the node. (b) The index $l$ iterate through all the positions where the kernel contains the input $x_i$.}
 \label{k_weights_vs_inputs}
 \end{figure}
 
-\noindent Let's now focus on the second goal of this subsection, i.e. explaining how to compute the \acrshort{cpca} gradients. The idea is to iterate through all the positions of the input image taking steps whose size are defined by the strides of the layer and to compute the mean of the \acrshort{cpca} learning rule such as:
+\noindent Let's now focus on the second goal of this subsection, i.e. explaining how to compute the \acrshort{cpca} gradients. The idea is to iterate through all the positions of the input image taking steps whose size are defined by the strides of the node and to compute the mean of the \acrshort{cpca} learning rule such as:
 
 \begin{equation}
 \Delta w_{ij} = \frac{\epsilon}{|K|} \sum_{k} y_{jk}(x_{ik} - w_{ij})
@@ -299,12 +299,12 @@ This section has two objectives. First, it aims to explain the backpropagation i
 
 \section{Neural Network}
 
-The neural network class allow to build any sequential neural network, i.e. any stack of layers. Also, it provides a $addLayer$ function that add a layer on the top of stack. Its role is to wrap the stack of layer and to call the $activation$ and $update$ functions when required to ensure predictions and training.
+The neural network class allow to build any sequential neural network, i.e. any stack of nodes. Also, it provides a $addLayer$ function that add a node on the top of stack. Its role is to wrap the stack of node and to call the $activation$ and $update$ functions when required to ensure predictions and training.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=15cm, height=5cm]{neural_network}
-\caption{This figure shows how the neural network, the layers and the data set interact with each other. The first use case shows layers being added to the stack. The second shows the training of the network where the black arrows are calls to the $activation$ function and the red arrows the calls to the $update$ function. Finally, the third use case shows the prediction process using the same color code.}
+\caption{This figure shows how the neural network, the nodes and the data set interact with each other. The first use case shows nodes being added to the stack. The second shows the training of the network where the black arrows are calls to the $activation$ function and the red arrows the calls to the $update$ function. Finally, the third use case shows the prediction process using the same color code.}
 \end{figure}
 
 \section{Unit testing}
@@ -358,16 +358,16 @@ $$\_\_device\_\_\ float\ device\_function(int\ parameter)\ \{\ ...\ \}$$
 
 \subsection{Application to neural networks}
 
-Section \ref{sec:core_concepts} has presented all the main concepts of CUDA C, the following describes how it have been used to speed up the framework. First, it is worth noting that some computer does not have \acrshort{gpu}. Also, it is useful to provide a factory that instanciate either the \acrshort{cpu} or the \acrshort{gpu} implementation depending on the hardware available in the computer. The following line load the correct implementation for the $Conv2d$ layer:
+Section \ref{sec:core_concepts} has presented all the main concepts of CUDA C, the following describes how it have been used to speed up the framework. First, it is worth noting that some computer does not have \acrshort{gpu}. Also, it is useful to provide a factory that instanciate either the \acrshort{cpu} or the \acrshort{gpu} implementation depending on the hardware available in the computer. The following line load the correct implementation for the $Conv2d$ node:
 
 $$Conv2dInterface\ conv\_2d\ =\ TasksFactory.create("Conv2d");$$
 
-\noindent \textcite{DBLP:journals/tjs/BritoFCSWMF16} show that \acrshort{gpu}s can be successfully used to speed up artificial neural networks. Even if the framemork has a \acrshort{gpu} implementation for all layers presented in \ref{sec:layers}. The following paragraphs focus on the backward pass in 2D convolutional layer. Indeed, it is one of the most challenging to understand and a clear explanation will provide great insight for using \acrshort{gpu} to speed up neural networks. This kernel is using all the blocks and threads dimensions, i.e. all the following indexes are used: $threadIdx.x$, $threadIdx.y$, $threadIdx.z$, $blockIdx.x$, $blockIdx.y$ and $blockIdx.z$. The block indexes are used to go through all the weights that are stored in a 4D array, i.e. the first dimension corresponds to the number of neurons in the layer, the second to the number of input channels, and finally, the third and fourth to the kernel's width and height respectively. Because there is only three blocks indexes (i.e. $x$, $y$ and $z$), the first one is used to go through the two first dimensions. As explained in section \ref{sec:conv2d} the computation of the derivatative with repect to the weights required to sum the gradients over all positions $k$, cf equation \ref{eq:dwc2d}. As previously explained, each block is responsible to compute the derivative with respect to one weight, i.e. all weights are computed in parrallel. Moreover, the threads of each block proccess several part of the images at the same time. The threads' $x$ index iterate through all the images of the batch being processed, the $y$ index trough all the vertical positions and $z$ index trough all the horizontal positions. The shared memory is used by each thread to store the sum of all the positions it is responsible. Then, the $\_\_syncthreads()$ function is called to synchronize all the threads. Finally, the first thread of each block sum the elements of the shared memory and place the result in the output buffer. The figure \ref{fig:conv2d_backpropagation} illustrate this process for a batch of two images.
+\noindent \textcite{DBLP:journals/tjs/BritoFCSWMF16} show that \acrshort{gpu}s can be successfully used to speed up artificial neural networks. Even if the framemork has a \acrshort{gpu} implementation for all nodes presented in \ref{sec:nodes}. The following paragraphs focus on the backward pass in 2D convolutional node. Indeed, it is one of the most challenging to understand and a clear explanation will provide great insight for using \acrshort{gpu} to speed up neural networks. This kernel is using all the blocks and threads dimensions, i.e. all the following indexes are used: $threadIdx.x$, $threadIdx.y$, $threadIdx.z$, $blockIdx.x$, $blockIdx.y$ and $blockIdx.z$. The block indexes are used to go through all the weights that are stored in a 4D array, i.e. the first dimension corresponds to the number of neurons in the node, the second to the number of input channels, and finally, the third and fourth to the kernel's width and height respectively. Because there is only three blocks indexes (i.e. $x$, $y$ and $z$), the first one is used to go through the two first dimensions. As explained in section \ref{sec:conv2d} the computation of the derivatative with repect to the weights required to sum the gradients over all positions $k$, cf equation \ref{eq:dwc2d}. As previously explained, each block is responsible to compute the derivative with respect to one weight, i.e. all weights are computed in parrallel. Moreover, the threads of each block proccess several part of the images at the same time. The threads' $x$ index iterate through all the images of the batch being processed, the $y$ index trough all the vertical positions and $z$ index trough all the horizontal positions. The shared memory is used by each thread to store the sum of all the positions it is responsible. Then, the $\_\_syncthreads()$ function is called to synchronize all the threads. Finally, the first thread of each block sum the elements of the shared memory and place the result in the output buffer. The figure \ref{fig:conv2d_backpropagation} illustrate this process for a batch of two images.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=13cm, height=10cm]{conv2d_backpropagation}
-\caption{This figure illustrate the GPU-enabled backpropagation in the convolutional layer. For the sake of simplicity this figure assumes two images with only one channel and two kernels of size 2x2. a) shows the meaning of the blocks and threads indexes. b) shows how the summation over all the positions is performed in parallel. This assume a 2x2 stride and a 1x2x2 grid of blocks. The first thread, i.e. purple, is responsible for the top right positions within each images. The last thread, i.e. orange, is responsible for the bottom left positions within each images. c) shows the sum of the elements in the shared memory preformed by the first thread of each block after the call to the $\_\_syncthreads()$ function.}
+\caption{This figure illustrate the GPU-enabled backpropagation in the convolutional node. For the sake of simplicity this figure assumes two images with only one channel and two kernels of size 2x2. a) shows the meaning of the blocks and threads indexes. b) shows how the summation over all the positions is performed in parallel. This assume a 2x2 stride and a 1x2x2 grid of blocks. The first thread, i.e. purple, is responsible for the top right positions within each images. The last thread, i.e. orange, is responsible for the bottom left positions within each images. c) shows the sum of the elements in the shared memory preformed by the first thread of each block after the call to the $\_\_syncthreads()$ function.}
 \label{fig:conv2d_backpropagation}
 \end{figure}
 
@@ -386,7 +386,7 @@ Analysis of features learned
 
 %TODO future direction
 Apply to other architechture resnet, alexnet, unet, linknet
-Apply to other type of layers dense recurrent
+Apply to other type of nodes dense recurrent
 
 \printbibliography
 
