@@ -25,17 +25,19 @@ class CNN_vs_HCNN_accuracy {
         int epochs;
         int debug;
         int[] kernels;
+        int dataSetSize;
 
         private boolean t;
         private boolean p;
         private boolean d;
         private boolean e;
         private boolean k;
+        private boolean s;
 
         Parameters(String[] args) {
-            if (args.length != 5) throw new InvalidParameterException();
+            if (args.length != 6) throw new InvalidParameterException();
             for (String arg : args) parse(arg);
-            if (!t || !p || !d || !e || !k) throw new InvalidParameterException();
+            if (!t || !p || !d || !e || !k || !s) throw new InvalidParameterException();
         }
 
         private void parse(String arg) {
@@ -61,6 +63,10 @@ class CNN_vs_HCNN_accuracy {
                 case "-k":
                     k = true;
                     parseK(table[1]);
+                    break;
+                case "-s":
+                    s = true;
+                    parseS(table[1]);
                     break;
                 default:
                     throw new InvalidParameterException();
@@ -91,10 +97,14 @@ class CNN_vs_HCNN_accuracy {
                 kernels[i] = Integer.valueOf(strings[i]);
             }
         }
+
+        void parseS(String arg) {
+            dataSetSize = Integer.valueOf(arg);
+        }
     }
 
     private static void network1(Parameters param) {
-        DataSet dataSet = DataSetsFactory.create("Mnist", 20);
+        DataSet dataSet = DataSetsFactory.create("Mnist", 20, param.dataSetSize);
         int k = Integer.valueOf(param.testParameters[0]);
         System.out.println("k == " + k);
         NeuralNetwork cnn = new NeuralNetwork()
@@ -108,7 +118,7 @@ class CNN_vs_HCNN_accuracy {
     }
 
     private static void network2(Parameters param) {
-        DataSet dataSet = DataSetsFactory.create("Mnist", 20);
+        DataSet dataSet = DataSetsFactory.create("Mnist", 20, param.dataSetSize);
         float ratio = Float.valueOf(param.testParameters[0]);
         System.out.println("ratio == " + ratio);
         NeuralNetwork cnn = new NeuralNetwork()
@@ -122,7 +132,7 @@ class CNN_vs_HCNN_accuracy {
     }
 
     private static void network3(Parameters param) {
-        DataSet dataSet = DataSetsFactory.create("Mnist", 20);
+        DataSet dataSet = DataSetsFactory.create("Mnist", 20, param.dataSetSize);
         int k = Integer.valueOf(param.testParameters[0]);
         float ratio = Float.valueOf(param.testParameters[1]);
         System.out.println("k == " + k + ", ratio == " + ratio);
@@ -149,7 +159,7 @@ class CNN_vs_HCNN_accuracy {
         try {
             // Baseline.
             System.out.println("Start baseline.");
-            DataSet dataSet = DataSetsFactory.create("Mnist", 20);
+            DataSet dataSet = DataSetsFactory.create("Mnist", 20, param.dataSetSize);
             NeuralNetwork cnn = new NeuralNetwork()
                     .addLayer("Conv2d", new Conv2dConf().setFilters(param.kernels))
                     .addLayer("MaxPooling2d")

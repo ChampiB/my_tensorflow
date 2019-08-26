@@ -20,6 +20,8 @@ public class MnistDataSet extends cnn.dataset.DataSet {
     private MnistDataSetIterator test;
     private DataSet trainSet;
     private DataSet testSet;
+    private int maxNbExamples;
+    private int batchIndex;
 
     /**
      * Create the helper for the MNIST data set.
@@ -29,6 +31,8 @@ public class MnistDataSet extends cnn.dataset.DataSet {
      * @param nCols is the number of columns per image
      */
     public MnistDataSet(int seed, int batchSize, int nRows, int nCols) {
+        this.batchIndex = 0;
+        this.maxNbExamples = -1;
         this.seed = seed;
         this.batchSize = batchSize;
         this.nRows = nRows;
@@ -53,6 +57,16 @@ public class MnistDataSet extends cnn.dataset.DataSet {
      */
     public MnistDataSet(int batchSize) {
         this(123, batchSize, 28, 28);
+    }
+
+    /**
+     * Create the helper for the MNIST data set.
+     * @param batchSize is the number of examples per batch
+     * @param maxNbExamples the maximum number of examples to use during the training.
+     */
+    public MnistDataSet(int batchSize, int maxNbExamples) {
+        this(123, batchSize, 28, 28);
+        this.maxNbExamples = maxNbExamples;
     }
 
     /**
@@ -95,6 +109,8 @@ public class MnistDataSet extends cnn.dataset.DataSet {
      */
     public boolean hasNextBatch(boolean training) {
         if (training) {
+            if (maxNbExamples != -1 && (batchIndex + 1) * batchSize > maxNbExamples)
+                return false;
             return train.hasNext();
         } else {
             return test.hasNext();
@@ -106,6 +122,7 @@ public class MnistDataSet extends cnn.dataset.DataSet {
      * @param training defines the data set to use (training vs testing).
      */
     public void nextBatch(boolean training) {
+        batchIndex++;
         if (training) {
             trainSet = train.next();
         } else {
@@ -177,6 +194,7 @@ public class MnistDataSet extends cnn.dataset.DataSet {
      * Reload the data set.
      */
     public void reload(boolean training) {
+        batchIndex = 0;
         if (training) {
             this.train = getTrainingIterator();
         } else {
